@@ -1,51 +1,11 @@
-// Importer les modules nécessaires
+// profileRouter.js
 import express from "express";
-import { success } from "./helper.mjs";
-import { ValidationError, Op } from "sequelize";
 import { User } from "../db/sequelize.mjs";
 import bcrypt from "bcrypt";
 
+const profileRouter = express.Router();
 
-// Initialiser le routeur pour les produits
-const router = express();
-
-/**
-* @swagger
-* /api/products/:
-* get:
-* tags: [Products]
-* security:
-* - bearerAuth: []
-* summary: Retrieve all products.
-* description: Retrieve all products. Can be used to populate a select HTML tag.
-* responses:
-* 200:
-* description: All products.
-* content:
-* application/json:
-* schema:
-* type: object
-* properties:
-* data:
-* type: object
-* properties:
-* id:
-* type: integer
-* description: The product ID.
-* example: 1
-* name:
-* type: string
-* description: The product's name.
-* example: Big Mac
-* price:
-* type: number
-* description: The product's price.
-* example: 5.99
-*
-*/
-
-
-router.get("/user/:name", (req, res) => {
+profileRouter.get("/user/:name", (req, res, next) => { // Utilisation de req.params pour récupérer le nom
   const { name } = req.params;
   const { username, password } = req.body;
 
@@ -83,12 +43,9 @@ router.get("/user/:name", (req, res) => {
             res.status(401).json({ message: "Mot de passe incorrect." });
           }
         })
-        .catch((error) => {
-          // En cas d'erreur lors de la comparaison des mots de passe, renvoyer une réponse d'erreur
-          console.error("Erreur lors de la comparaison des mots de passe :", error);
-          res.status(500).json({ message: "Erreur lors de la connexion." });
-        });
+        .catch(next); // Passer l'erreur au middleware d'erreur global
     })
+    .catch(next); // Passer l'erreur au middleware d'erreur global
 });
-// Exporter le routeur des produits
-export { router };
+
+export { profileRouter };

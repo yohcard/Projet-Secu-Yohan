@@ -1,17 +1,15 @@
+// server.js
 import express from "express";
+import { router } from "./routes/mainrouter.mjs"; // Correction du chemin d'importation
+import { profileRouter } from "./routes/profileRouter.mjs"; // Correction du chemin d'importation
+import { loginRouter } from "./routes/login.mjs"; // Correction du chemin d'importation
 import { sequelize, initDb } from "./db/sequelize.mjs";
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./swagger.mjs";
-import { loginRouter } from "./routes/login.mjs";
-import { router } from "./routes/mainrouter.mjs"
-
 
 const app = express();
-const port = 3000;
+const port = 1234;
 
 app.use(express.json());
 
-// Initialisation de la connexion à la base de données
 sequelize
   .authenticate()
   .then(() => {
@@ -23,9 +21,10 @@ sequelize
   );
 
 // Routes
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 app.use("/api/login", loginRouter);
 app.use("/router", router);
+app.use("/profile", profileRouter );
+
 // Route par défaut
 app.get("/", (req, res) => {
   res.send("web_app");
