@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ error: "Token manquant" });
   }
 
-  jwt.verify(token, "yourSecretKey", (err, decoded) => {
+  jwt.verify(token.split(" ")[1], "yourSecretKey", (err, decoded) => {
     if (err) {
       console.error("Erreur lors de la vérification du token JWT:", err);
       return res.status(403).json({ error: "Token invalide" });
@@ -36,7 +36,10 @@ router.get("/user", verifyToken, (req, res) => {
     [userId],
     (error, results) => {
       if (error) {
-        console.error("Erreur lors de la récupération des données de l'utilisateur:", error);
+        console.error(
+          "Erreur lors de la récupération des données de l'utilisateur:",
+          error
+        );
         return res.status(500).json({ error: "Erreur de serveur" });
       }
 

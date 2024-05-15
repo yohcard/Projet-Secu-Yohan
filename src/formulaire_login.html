@@ -1,23 +1,75 @@
-<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Connexion</h2>
-    <form id="loginForm" action="/login" method="POST">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Form</title>
+  </head>
+  <body>
+    <div>
+      <h2>Login</h2>
+      <form id="loginForm" action="https://localhost:1234/login" method="post">
         <div>
-            <label for="username">Nom d'utilisateur:</label>
-            <input type="text" id="username" name="username" required>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
         </div>
         <div>
-            <label for="password">Mot de passe:</label>
-            <input type="password" id="password" name="password" required>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
         </div>
-        <button type="submit">Se connecter</button>
-    </form>
-</body>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+    <div>
+      <h2>Profile</h2>
+      <button type="button" id="profileButton">View Profile</button>
+    </div>
+
+    <script>
+      // Fonction pour récupérer le token du stockage du navigateur
+      // Fonction pour récupérer le token du stockage du navigateur
+      function getToken() {
+        return localStorage.getItem("token");
+      }
+
+      // Fonction pour effectuer la requête GET vers la page du profil avec le token
+      function viewProfile() {
+        const token = getToken();
+        console.log("Token récupéré pour la requête :", token);
+        if (token) {
+          const xhr = new XMLHttpRequest();
+          xhr.open("GET", "https://localhost:1234/router/user");
+          xhr.setRequestHeader("Authorization", "Bearer " + token);
+          xhr.onload = function () {
+            // Traitez la réponse ici si nécessaire
+            if (xhr.status === 200) {
+              // Affichez les données de l'utilisateur dans la console pour cet exemple
+              console.log(xhr.responseText);
+            } else {
+              // Gérez les erreurs si nécessaire
+              console.error("Erreur lors de la requête: " + xhr.status);
+            }
+          };
+          xhr.send();
+        } else {
+          console.error("Token non disponible.");
+        }
+      }
+
+      // Écouteur d'événement pour le bouton de profil
+      document
+        .getElementById("profileButton")
+        .addEventListener("click", viewProfile);
+
+      // Vérifier si le token est stocké dans le localStorage après la connexion réussie
+      window.addEventListener("load", () => {
+        const token = getToken();
+        if (token) {
+          console.log("Token récupéré après le chargement de la page :", token);
+        } else {
+          console.error("Token non disponible après le chargement de la page.");
+        }
+      });
+    </script>
+  </body>
 </html>
