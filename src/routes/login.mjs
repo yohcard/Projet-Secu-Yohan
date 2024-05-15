@@ -1,54 +1,62 @@
+// login.mjs
+
 import express from "express";
-import session from "express-session";
-import { User } from "../db/sequelize.mjs";
-import bcrypt from "bcrypt";
-
-const app = express();
-
-// Configuration de express-session
-app.use(session({
-  secret: 'b$Q8GkmFzT9n3D!pXY*Wu5R7jc@LV2qS',
-  resave: false,
-  saveUninitialized: true
-}));
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import connection from "../db/mysql.mjs";
 
 const loginRouter = express.Router();
 
+// Endpoint de connexion
 loginRouter.post("/", (req, res) => {
   const { username, password } = req.body;
 
-  User.findOne({ where: { username: username } })
-    .then((user) => {
-      if (!user) {
-        return res.status(404).json({ message: "Nom d'utilisateur incorrect" });
+  // Vérifier si l'utilisateur existe dans la base de données
+  connection.query(
+    "SELECT * FROM Users WHERE username = ?",
+    [username],
+    (error, results) => {
+      if (error) {
+        console.error("Erreur lors de la récupération de l'utilisateur:", error);
+        return res.status(500).json({ error: "Erreur de serveur" });
       }
 
-      bcrypt.compare(password, user.password)
-        .then((match) => {
-          if (match) {
-            // Créer une session utilisateur
-            req.session.user = user;
+      if (results.length === 0) {
+        // L'utilisateur n'existe pas
+        return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+      }
 
-            res.status(200).json({ message: "Connexion réussie" });
-          } else {
-            res.status(401).json({ message: "Mot de passe incorrect" });
+      const user = results[0];
+
+      // Vérifier si le mot de passe est correct
+      bcrypt.compare(password, user.password, (err, isMatch) => {
+        if (err) {
+          console.error("Erreur lors de la comparaison des mots de passe:", err);
+          return res.status(500).json({ error: "Erreur de serveur" });
+        }
+
+        if (!isMatch) {
+          // Mot de passe incorrect
+          return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+        }
+
+        // Si l'utilisateur et le mot de passe sont corrects, créer un token JWT
+        const payload = {
+          userId: user.id,
+          username: user.username
+        };
+
+        jwt.sign(payload, "yourSecretKey", { expiresIn: "1h" }, (jwtError, token) => {
+          if (jwtError) {
+            console.error("Erreur lors de la création du token JWT:", jwtError);
+            return res.status(500).json({ error: "Erreur de serveur" });
           }
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la comparaison des mots de passe :", error);
-          res.status(500).json({ message: "Erreur lors de la connexion" });
+          // Envoi du token au client
+          res.json({ token });
         });
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la recherche de l'utilisateur :", error);
-      res.status(500).json({ message: "Erreur lors de la connexion" });
-    });
-});
-
-app.use("/login", loginRouter);
-
-app.listen(443, () => {
-  console.log("Serveur démarré sur le port 443");
+      });
+    }
+  );
 });
 
 export { loginRouter };
