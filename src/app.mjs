@@ -3,7 +3,6 @@ import https from "node:https";
 import fs from "fs";
 import mysql from "mysql2";
 import { router } from "./routes/mainrouter.mjs";
-import { profileRouter } from "./routes/profileRouter.mjs";
 import { loginRouter } from "./routes/login.mjs";
 import connection from "./db/mysql.mjs";
 import { fileURLToPath } from "url";
@@ -30,7 +29,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Ajout du middleware express.urlencoded()
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   console.log(`Requête ${req.method} reçue sur ${req.url}`);
@@ -47,7 +46,6 @@ connection.connect((error) => {
     // Routes
     app.use("/login", loginRouter);
     app.use("/router", router);
-    app.use("/profile", profileRouter);
 
     // Route par défaut pour servir le fichier HTML
     app.get("/", (req, res) => {

@@ -71,8 +71,10 @@ loginRouter.post("/", (req, res) => {
               );
               return res.status(500).json({ error: "Erreur de serveur" });
             }
+
             // Envoi du token au client
             res.json({ token });
+            localStorage.setItem("token", token);
           }
         );
       });

@@ -27,7 +27,6 @@
 
     <script>
       // Fonction pour récupérer le token du stockage du navigateur
-      // Fonction pour récupérer le token du stockage du navigateur
       function getToken() {
         return localStorage.getItem("token");
       }
@@ -61,13 +60,20 @@
         .getElementById("profileButton")
         .addEventListener("click", viewProfile);
 
-      // Vérifier si le token est stocké dans le localStorage après la connexion réussie
+      // Vérifier si le token est stocké dans le localStorage après le chargement de la page
       window.addEventListener("load", () => {
         const token = getToken();
         if (token) {
-          console.log("Token récupéré après le chargement de la page :", token);
+          console.log(
+            "Le token est disponible après le chargement de la page :",
+            token
+          );
+          // Ajoutez ici toute action supplémentaire à effectuer si le token est disponible
         } else {
-          console.error("Token non disponible après le chargement de la page.");
+          console.error(
+            "Le token n'est pas disponible après le chargement de la page."
+          );
+          // Ajoutez ici toute action supplémentaire à effectuer si le token n'est pas disponible
         }
       });
     </script>
