@@ -8,7 +8,7 @@
   <body>
     <div>
       <h2>Login</h2>
-      <form id="loginForm" action="https://localhost:1234/login" method="post">
+      <form id="loginForm">
         <div>
           <label for="username">Username:</label>
           <input type="text" id="username" name="username" required />
@@ -24,56 +24,85 @@
       <h2>Profile</h2>
       <button type="button" id="profileButton">View Profile</button>
     </div>
+    <div id="userProfile"></div>
 
     <script>
-      // Fonction pour récupérer le token du stockage du navigateur
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent form submission
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+
+          fetch("https://localhost:1234/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.token) {
+                // Store the token in local storage
+                localStorage.setItem("token", data.token);
+              } else {
+                console.error("Login failed:", data.error);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+
+      // Function to retrieve the token from the browser's storage
       function getToken() {
         return localStorage.getItem("token");
       }
 
-      // Fonction pour effectuer la requête GET vers la page du profil avec le token
+      // Function to make the GET request to the profile page with the token
       function viewProfile() {
         const token = getToken();
-        console.log("Token récupéré pour la requête :", token);
         if (token) {
           const xhr = new XMLHttpRequest();
           xhr.open("GET", "https://localhost:1234/router/user");
           xhr.setRequestHeader("Authorization", "Bearer " + token);
           xhr.onload = function () {
-            // Traitez la réponse ici si nécessaire
             if (xhr.status === 200) {
-              // Affichez les données de l'utilisateur dans la console pour cet exemple
-              console.log(xhr.responseText);
+              // Parse the user data
+              const user = JSON.parse(xhr.responseText);
+              // Update the DOM with user data
+              const userProfileDiv = document.getElementById("userProfile");
+              userProfileDiv.innerHTML = `
+                <h3>User Profile</h3>
+                <p><strong>Username:</strong> ${user.username}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Name:</strong> ${user.firstName}</p>
+                <p><strong>Last Name:</strong> ${user.lastName}</p>
+                <p><strong>Age:</strong> ${user.age}</p>
+                <p><strong>Country:</strong> ${user.country}</p>
+              `;
             } else {
-              // Gérez les erreurs si nécessaire
-              console.error("Erreur lors de la requête: " + xhr.status);
+              console.error("Request error: " + xhr.status);
             }
           };
           xhr.send();
         } else {
-          console.error("Token non disponible.");
+          console.error("Token not available.");
         }
       }
 
-      // Écouteur d'événement pour le bouton de profil
+      // Event listener for the profile button
       document
         .getElementById("profileButton")
         .addEventListener("click", viewProfile);
 
-      // Vérifier si le token est stocké dans le localStorage après le chargement de la page
+      // Check if the token is stored in localStorage after the page loads
       window.addEventListener("load", () => {
         const token = getToken();
-        if (token) {
-          console.log(
-            "Le token est disponible après le chargement de la page :",
-            token
-          );
-          // Ajoutez ici toute action supplémentaire à effectuer si le token est disponible
-        } else {
-          console.error(
-            "Le token n'est pas disponible après le chargement de la page."
-          );
-          // Ajoutez ici toute action supplémentaire à effectuer si le token n'est pas disponible
+        if (!token) {
+          console.error("Token not available after page load.");
         }
       });
     </script>

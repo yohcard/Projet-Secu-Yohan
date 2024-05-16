@@ -31,18 +31,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  console.log(`Requête ${req.method} reçue sur ${req.url}`);
-  next(); // Passe au prochain middleware
-});
-
 // Connexion à la base de données MySQL
 connection.connect((error) => {
   if (error) {
     console.error("Impossible de se connecter à la DB:", error);
   } else {
-    console.log("La connexion à la base de données a bien été établie");
-
     // Routes
     app.use("/login", loginRouter);
     app.use("/router", router);
@@ -53,10 +46,6 @@ connection.connect((error) => {
     });
 
     // Utilisation de HTTPS pour démarrer le serveur
-    https.createServer(httpsOptions, app).listen(port, () => {
-      console.log(
-        `L'application écoute sur le port ${port} en utilisant HTTPS`
-      );
-    });
+    https.createServer(httpsOptions, app).listen(port);
   }
 });
