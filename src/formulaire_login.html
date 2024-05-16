@@ -30,7 +30,7 @@
       document
         .getElementById("loginForm")
         .addEventListener("submit", function (event) {
-          event.preventDefault(); // Prevent form submission
+          event.preventDefault();
 
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
@@ -45,7 +45,7 @@
             .then((response) => response.json())
             .then((data) => {
               if (data.token) {
-                // Store the token in local storage
+                // stockage du token dans le localstorage du navigateur
                 localStorage.setItem("token", data.token);
               } else {
                 console.error("Login failed:", data.error);
@@ -56,12 +56,12 @@
             });
         });
 
-      // Function to retrieve the token from the browser's storage
+      // Function qui recupere le token dans le localstorage du navigateur
       function getToken() {
         return localStorage.getItem("token");
       }
 
-      // Function to make the GET request to the profile page with the token
+      // Function de la requette GET pour acceder au profile  avec le token
       function viewProfile() {
         const token = getToken();
         if (token) {
@@ -70,9 +70,9 @@
           xhr.setRequestHeader("Authorization", "Bearer " + token);
           xhr.onload = function () {
             if (xhr.status === 200) {
-              // Parse the user data
+              // chemin de donnée du user user
               const user = JSON.parse(xhr.responseText);
-              // Update the DOM with user data
+              // actualise le DOM avec les datas du user
               const userProfileDiv = document.getElementById("userProfile");
               userProfileDiv.innerHTML = `
                 <h3>User Profile</h3>
@@ -93,12 +93,11 @@
         }
       }
 
-      // Event listener for the profile button
       document
         .getElementById("profileButton")
         .addEventListener("click", viewProfile);
 
-      // Check if the token is stored in localStorage after the page loads
+      // vrerifie si le token a ete chargé apres le chargement de la page
       window.addEventListener("load", () => {
         const token = getToken();
         if (!token) {

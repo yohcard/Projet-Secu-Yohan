@@ -7,11 +7,10 @@ import connection from "../db/mysql.mjs";
 
 const loginRouter = express.Router();
 
-// Endpoint de connexion
 loginRouter.post("/", (req, res) => {
   const { username, password } = req.body;
 
-  // Check if the user exists in the database
+  // vérifie si le user existe dans la db
   connection.query(
     "SELECT * FROM Users WHERE username = ?",
     [username],
@@ -21,26 +20,26 @@ loginRouter.post("/", (req, res) => {
       }
 
       if (results.length === 0) {
-        // User does not exist
+        // User n'existe pas
         return res.status(401).json({ error: "Invalid username or password" });
       }
 
       const user = results[0];
 
-      // Check if the password is correct
+      // vérifie si le password est correct
       bcrypt.compare(password, user.password, (err, isMatch) => {
         if (err) {
           return res.status(500).json({ error: "Server error" });
         }
 
         if (!isMatch) {
-          // Incorrect password
+          //  password incorrect
           return res
             .status(401)
             .json({ error: "Invalid username or password" });
         }
 
-        // User and password are correct, create a JWT token
+        // si le user et le password sont correct, ceation du token JWT
         const payload = {
           userId: user.id,
           username: user.username,
@@ -55,7 +54,7 @@ loginRouter.post("/", (req, res) => {
               return res.status(500).json({ error: "Server error" });
             }
 
-            // Send the token to the client
+            // evoie du token au client
             res.json({ token });
           }
         );

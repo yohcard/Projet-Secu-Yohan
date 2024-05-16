@@ -13,7 +13,7 @@ router.get("/user", (req, res) => {
     return res.status(401).json({ error: "Authorization header missing" });
   }
 
-  const token = authHeader.split(" ")[1]; // Extract the token
+  const token = authHeader.split(" ")[1]; // extracton du token
 
   jwt.verify(token, "yourSecretKey", (err, decoded) => {
     if (err) {
@@ -35,7 +35,7 @@ router.get("/user", (req, res) => {
         }
 
         const user = results[0];
-        res.json(user); // Send the user data as JSON
+        // res.json(user);
       }
     );
   });
