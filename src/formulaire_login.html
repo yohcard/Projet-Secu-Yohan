@@ -114,7 +114,14 @@
         .getElementById("searchButton")
         .addEventListener("click", function () {
           const searchTerm = document.getElementById("searchTerm").value;
+          const regex = /^[a-zA-Z0-9.]+$/; // Expression régulière pour les lettres, les chiffres et les points
           const token = getToken();
+          if (!regex.test(searchTerm)) {
+            alert(
+              "Le terme de recherche ne doit contenir que des lettres, des chiffres et des points."
+            );
+            return;
+          }
           if (token) {
             fetch(
               `https://localhost:443/router/searchUsers?searchTerm=${searchTerm}`,
@@ -135,14 +142,14 @@
                 } else {
                   data.forEach((user) => {
                     searchResultsDiv.innerHTML += `
-                      <p><strong>Username:</strong> ${user.username}</p>
-                      <p><strong>Email:</strong> ${user.email}</p>
-                      <p><strong>Name:</strong> ${user.firstName}</p>
-                      <p><strong>Last Name:</strong> ${user.lastName}</p>
-                      <p><strong>Age:</strong> ${user.age}</p>
-                      <p><strong>Country:</strong> ${user.country}</p>
-                      <hr>
-                      `;
+                <p><strong>Username:</strong> ${user.username}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Name:</strong> ${user.firstName}</p>
+                <p><strong>Last Name:</strong> ${user.lastName}</p>
+                <p><strong>Age:</strong> ${user.age}</p>
+                <p><strong>Country:</strong> ${user.country}</p>
+                <hr>
+                `;
                   });
                 }
               })
