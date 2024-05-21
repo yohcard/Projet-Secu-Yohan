@@ -1,5 +1,3 @@
-// mainrouter.mjs
-
 import express from "express";
 import jwt from "jsonwebtoken";
 import connection from "../db/mysql.mjs";
@@ -13,7 +11,7 @@ router.get("/user", (req, res) => {
     return res.status(401).json({ error: "Authorization header missing" });
   }
 
-  const token = authHeader.split(" ")[1]; // extracton du token
+  const token = authHeader.split(" ")[1];
 
   jwt.verify(token, "yourSecretKey", (err, decoded) => {
     if (err) {
@@ -35,7 +33,7 @@ router.get("/user", (req, res) => {
         }
 
         const user = results[0];
-        // res.json(user);
+        res.json(user);
       }
     );
   });

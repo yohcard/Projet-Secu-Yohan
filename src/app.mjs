@@ -27,25 +27,24 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connexion à la base de données MySQL
 connection.connect((error) => {
   if (error) {
     console.error("Impossible de se connecter à la DB:", error);
   } else {
-    // Routes
+    console.log("Connected to DB");
+
     app.use("/login", loginRouter);
     app.use("/router", router);
 
-    // Route par défaut pour servir le fichier HTML
     app.get("/", (req, res) => {
       res.sendFile(path.join(__dirname, "formulaire_login.html"));
     });
 
-    // Utilisation de HTTPS pour démarrer le serveur
-    https.createServer(httpsOptions, app).listen(port);
+    https.createServer(httpsOptions, app).listen(port, () => {
+      console.log(`Server is listening on port ${port}`);
+    });
   }
 });
