@@ -35,6 +35,15 @@
 
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
+          const errorMessage = document.getElementById("errorMessage");
+
+          const regex = /^[a-zA-Z0-9.]+$/; // Regex pour autoriser uniquement les lettres et les chiffres
+
+          if (!regex.test(username) || !regex.test(password)) {
+            errorMessage.textContent =
+              "Username et Password ne doivent contenir que des lettres et des chiffres.";
+            return;
+          }
 
           fetch("https://localhost:1234/login", {
             method: "POST",
@@ -47,18 +56,13 @@
             .then((data) => {
               if (data.token) {
                 localStorage.setItem("token", data.token);
-                document.getElementById("errorMessage").textContent =
-                  "Login successful";
+                errorMessage.textContent = "Login successful";
               } else {
-                document.getElementById(
-                  "errorMessage"
-                ).textContent = `Login failed: ${data.error}`;
+                errorMessage.textContent = `Login failed: ${data.error}`;
               }
             })
             .catch((error) => {
-              document.getElementById(
-                "errorMessage"
-              ).textContent = `Error: ${error.message}`;
+              errorMessage.textContent = `Error: ${error.message}`;
             });
         });
 
@@ -77,14 +81,14 @@
               const user = JSON.parse(xhr.responseText);
               const userProfileDiv = document.getElementById("userProfile");
               userProfileDiv.innerHTML = `
-                <h3>User Profile</h3>
-                <p><strong>Username:</strong> ${user.username}</p>
-                <p><strong>Email:</strong> ${user.email}</p>
-                <p><strong>Name:</strong> ${user.firstName}</p>
-                <p><strong>Last Name:</strong> ${user.lastName}</p>
-                <p><strong>Age:</strong> ${user.age}</p>
-                <p><strong>Country:</strong> ${user.country}</p>
-              `;
+              <h3>User Profile</h3>
+              <p><strong>Username:</strong> ${user.username}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Name:</strong> ${user.firstName}</p>
+              <p><strong>Last Name:</strong> ${user.lastName}</p>
+              <p><strong>Age:</strong> ${user.age}</p>
+              <p><strong>Country:</strong> ${user.country}</p>
+            `;
             } else {
               console.error("Request error: " + xhr.status);
             }

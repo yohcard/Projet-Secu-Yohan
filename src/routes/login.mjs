@@ -10,6 +10,17 @@ const loginRouter = express.Router();
 loginRouter.post("/", (req, res) => {
   const { username, password } = req.body;
 
+  const regex = /^[a-zA-Z0-9]+$/;
+
+  if (!regex.test(username) || !regex.test(password)) {
+    return res
+      .status(400)
+      .json({
+        error:
+          "Username et Password ne doivent contenir que des lettres et des chiffres.",
+      });
+  }
+
   // vérifie si le user existe dans la db
   connection.query(
     "SELECT * FROM Users WHERE username = ?",
