@@ -56,6 +56,7 @@ router.get("/searchUsers", (req, res) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
+    // Vérifier si l'utilisateur a le rôle admin
     if (decoded.role !== "admin") {
       return res.status(403).json({ error: "Access denied" });
     }
