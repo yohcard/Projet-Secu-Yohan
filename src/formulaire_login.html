@@ -27,6 +27,13 @@
     </div>
     <div id="userProfile"></div>
 
+    <div>
+      <h2>Admin</h2>
+      <input type="text" id="searchTerm" placeholder="Nom du visiteur" />
+      <button type="button" id="searchButton">Search</button>
+      <div id="searchResults"></div>
+    </div>
+
     <script>
       document
         .getElementById("loginForm")
@@ -37,7 +44,7 @@
           const password = document.getElementById("password").value;
           const errorMessage = document.getElementById("errorMessage");
 
-          const regex = /^[a-zA-Z0-9.]+$/; // Regex pour autoriser uniquement les lettres et les chiffres
+          const regex = /^[a-zA-Z0-9.]+$/;
 
           if (!regex.test(username) || !regex.test(password)) {
             errorMessage.textContent =
@@ -45,7 +52,7 @@
             return;
           }
 
-          fetch("https://localhost:1234/login", {
+          fetch("https://localhost:443/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -74,7 +81,7 @@
         const token = getToken();
         if (token) {
           const xhr = new XMLHttpRequest();
-          xhr.open("GET", "https://localhost:1234/router/user");
+          xhr.open("GET", "https://localhost:443/router/user");
           xhr.setRequestHeader("Authorization", "Bearer " + token);
           xhr.onload = function () {
             if (xhr.status === 200) {
@@ -102,6 +109,50 @@
       document
         .getElementById("profileButton")
         .addEventListener("click", viewProfile);
+
+      document
+        .getElementById("searchButton")
+        .addEventListener("click", function () {
+          const searchTerm = document.getElementById("searchTerm").value;
+          const token = getToken();
+          if (token) {
+            fetch(
+              `https://localhost:443/router/searchUsers?searchTerm=${searchTerm}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: "Bearer " + token,
+                },
+              }
+            )
+              .then((response) => response.json())
+              .then((data) => {
+                const searchResultsDiv =
+                  document.getElementById("searchResults");
+                searchResultsDiv.innerHTML = "<h3>Search Results</h3>";
+                if (data.length === 0) {
+                  searchResultsDiv.innerHTML += "<p>No users found</p>";
+                } else {
+                  data.forEach((user) => {
+                    searchResultsDiv.innerHTML += `
+                      <p><strong>Username:</strong> ${user.username}</p>
+                      <p><strong>Email:</strong> ${user.email}</p>
+                      <p><strong>Name:</strong> ${user.firstName}</p>
+                      <p><strong>Last Name:</strong> ${user.lastName}</p>
+                      <p><strong>Age:</strong> ${user.age}</p>
+                      <p><strong>Country:</strong> ${user.country}</p>
+                      <hr>
+                      `;
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          } else {
+            console.error("Token not available.");
+          }
+        });
 
       window.addEventListener("load", () => {
         const token = getToken();

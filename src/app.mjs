@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = 1234;
+const port = 443;
 
 const httpsOptions = {
   key: fs.readFileSync("server.key"),
@@ -21,7 +21,7 @@ const httpsOptions = {
 };
 
 const corsOptions = {
-  origin: "https://localhost:1234",
+  origin: "https://localhost:443",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };

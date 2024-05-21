@@ -13,12 +13,10 @@ loginRouter.post("/", (req, res) => {
   const regex = /^[a-zA-Z0-9]+$/;
 
   if (!regex.test(username) || !regex.test(password)) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Username et Password ne doivent contenir que des lettres et des chiffres.",
-      });
+    return res.status(400).json({
+      error:
+        "Username et Password ne doivent contenir que des lettres et des chiffres.",
+    });
   }
 
   // vérifie si le user existe dans la db
@@ -44,7 +42,7 @@ loginRouter.post("/", (req, res) => {
         }
 
         if (!isMatch) {
-          //  password incorrect
+          // password incorrect
           return res
             .status(401)
             .json({ error: "Invalid username or password" });
@@ -54,6 +52,7 @@ loginRouter.post("/", (req, res) => {
         const payload = {
           userId: user.id,
           username: user.username,
+          role: user.role, // inclut le rôle de l'utilisateur
         };
 
         jwt.sign(

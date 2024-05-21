@@ -1,3 +1,5 @@
+// mainrouter.mjs
+
 import express from "express";
 import jwt from "jsonwebtoken";
 import connection from "../db/mysql.mjs";
@@ -34,6 +36,39 @@ router.get("/user", (req, res) => {
 
         const user = results[0];
         res.json(user);
+      }
+    );
+  });
+});
+
+router.get("/searchUsers", (req, res) => {
+  const authHeader = req.headers.authorization;
+  const searchTerm = req.query.searchTerm;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "Authorization header missing" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, "yourSecretKey", (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    connection.query(
+      "SELECT * FROM Users WHERE firstName LIKE ? OR lastName LIKE ?",
+      [`%${searchTerm}%`, `%${searchTerm}%`],
+      (error, results) => {
+        if (error) {
+          return res.status(500).json({ error: "Server error" });
+        }
+
+        res.json(results);
       }
     );
   });
