@@ -6,7 +6,7 @@ import connection from "../db/mysql.mjs";
 
 const router = express.Router();
 
-router.get("/user", (req, res) => {
+router.get("/", (req, res) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {

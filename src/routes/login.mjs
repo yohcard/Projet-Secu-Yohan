@@ -1,7 +1,5 @@
-// login.mjs
-
 import express from "express";
-import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import connection from "../db/mysql.mjs";
 
@@ -14,8 +12,7 @@ loginRouter.post("/", (req, res) => {
 
   if (!regex.test(username) || !regex.test(password)) {
     return res.status(400).json({
-      error:
-        "Username et Password ne doivent contenir que des lettres et des chiffres.",
+      error: "Username et Password ne doivent contenir que des lettres et des chiffres.",
     });
   }
 
@@ -36,39 +33,37 @@ loginRouter.post("/", (req, res) => {
       const user = results[0];
 
       // vérifie si le password est correct
-      bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) {
-          return res.status(500).json({ error: "Server error" });
-        }
+      const hashPassword = (password, salt) => {
+        return crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
+      };
 
-        if (!isMatch) {
-          // password incorrect
-          return res
-            .status(401)
-            .json({ error: "Invalid username or password" });
-        }
+      const hash = hashPassword(password, user.salt);
 
-        // si le user et le password sont correct, ceation du token JWT
-        const payload = {
-          userId: user.id,
-          username: user.username,
-          role: user.role, // inclut le rôle de l'utilisateur
-        };
+      if (hash !== user.password) {
+        // password incorrect
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
 
-        jwt.sign(
-          payload,
-          "yourSecretKey",
-          { expiresIn: "1h" },
-          (jwtError, token) => {
-            if (jwtError) {
-              return res.status(500).json({ error: "Server error" });
-            }
+      // si le user et le password sont corrects, création du token JWT
+      const payload = {
+        userId: user.id,
+        username: user.username,
+        role: user.role, // inclut le rôle de l'utilisateur
+      };
 
-            // evoie du token au client
-            res.json({ token });
+      jwt.sign(
+        payload,
+        "yourSecretKey",
+        { expiresIn: "1h" },
+        (jwtError, token) => {
+          if (jwtError) {
+            return res.status(500).json({ error: "Server error" });
           }
-        );
-      });
+
+          // envoi du token au client
+          res.json({ token });
+        }
+      );
     }
   );
 });

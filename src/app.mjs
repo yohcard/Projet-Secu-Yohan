@@ -37,7 +37,7 @@ connection.connect((error) => {
     console.log("Connected to DB");
 
     app.use("/login", loginRouter);
-    app.use("/router", router);
+    app.use("/users", router);
 
     app.get("/", (req, res) => {
       res.sendFile(path.join(__dirname, "formulaire_login.html"));

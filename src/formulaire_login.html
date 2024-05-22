@@ -81,7 +81,7 @@
         const token = getToken();
         if (token) {
           const xhr = new XMLHttpRequest();
-          xhr.open("GET", "https://localhost:443/router/user");
+          xhr.open("GET", "https://localhost:443/users");
           xhr.setRequestHeader("Authorization", "Bearer " + token);
           xhr.onload = function () {
             if (xhr.status === 200) {
@@ -124,7 +124,7 @@
           }
           if (token) {
             fetch(
-              `https://localhost:443/router/searchUsers?searchTerm=${searchTerm}`,
+              `https://localhost:443/users/searchUsers?searchTerm=${searchTerm}`,
               {
                 method: "GET",
                 headers: {
