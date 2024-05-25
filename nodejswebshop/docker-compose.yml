@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0.30
+    container_name: db_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: your_database
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_user_pass
+    restart: always
+    ports:
+      - "6033:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.0
+    container_name: pma_container
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8081:80
+
+  nodejs:
+    build:
+      context: .
+      dockerfile: nodejs.dockerfile
+    container_name: nodejs_container
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./app:/home/node/app
+      - /home/node/app/node_modules
+    ports:
+      - "443:443"
+    depends_on:
+      - db
+    command: ["npm", "start"]
+
+volumes:
+  dbdata:
