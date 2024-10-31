@@ -43,6 +43,10 @@ connection.connect((error) => {
       res.sendFile(path.join(__dirname, "formulaire_login.html"));
     });
 
+    app.get("/page-d'acceuil.html", (req, res) => {
+      res.sendFile(path.join(__dirname, "page-d'acceuil.html")); // Page d'accueil
+    });
+
     https.createServer(httpsOptions, app).listen(port, () => {
       console.log(`Server is listening on port ${port}`);
     });

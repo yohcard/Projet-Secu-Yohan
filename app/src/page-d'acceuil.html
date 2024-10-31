@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page d'accueil</title>
+  </head>
+  <body>
+    <h2>Bienvenue</h2>
+    <div id="userInfo"></div>
+
+    <script>
+      function getToken() {
+        return localStorage.getItem("token");
+      }
+
+      const token = getToken();
+      if (token) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://localhost:443/users");
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            const user = JSON.parse(xhr.responseText);
+            const userInfoDiv = document.getElementById("userInfo"); // Change from userProfile to userInfo
+            userInfoDiv.innerHTML = `
+              <h3>User Profile</h3>
+              <p><strong>Username:</strong> ${user.username}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Name:</strong> ${user.firstName}</p>
+              <p><strong>Last Name:</strong> ${user.lastName}</p>
+              <p><strong>Age:</strong> ${user.age}</p>
+              <p><strong>Country:</strong> ${user.country}</p>
+            `;
+          } else {
+            console.error("Request error: " + xhr.status);
+          }
+        };
+        xhr.send();
+      } else {
+        console.error("Token not available.");
+      }
+    </script>
+  </body>
+</html>

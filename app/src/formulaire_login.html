@@ -53,24 +53,26 @@
           }
 
           fetch("https://localhost:443/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, password }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.token) {
-                localStorage.setItem("token", data.token);
-                errorMessage.textContent = "Login successful";
-              } else {
-                errorMessage.textContent = `Login failed: ${data.error}`;
-              }
-            })
-            .catch((error) => {
-              errorMessage.textContent = `Error: ${error.message}`;
-            });
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            // Stocker les informations de l'utilisateur dans le localStorage
+            
+            window.location.href = "page-d'acceuil.html"; // Rediriger vers la page d'accueil
+          } else {
+            errorMessage.textContent = `Login failed: ${data.error}`;
+          }
+        })
+        .catch((error) => {
+          errorMessage.textContent = `Error: ${error.message}`;
+        });
         });
 
       function getToken() {
